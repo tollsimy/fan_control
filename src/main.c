@@ -36,12 +36,13 @@ MA 02111, USA.
 
 #define GTK_GUI_FILE "src/gui_new.glade"
 #define FAN_LVL_AUTO 0
-#define FAN_LVL_FULL 8
+#define FAN_LVL_FULL 9
 // scan interval, critical temp, safe temp, fan speed
 #define AUTO_LBL_FMT "Current Options: %ds - %dC - %dC - %s"
 
 const char *fan_speeds[] = {
     "Auto",
+    "0",
     "1",
     "2",
     "3",
@@ -354,6 +355,14 @@ void apply_manual_speed(GtkWidget *object, gpointer data) {
 
 void change_fan_speed(int new_speed, application *app) {
     char speed_str[15], tmp_str[80];
+    int actual_level = new_speed;
+
+    // Map array index to actual fan level
+    // Index 0 = auto, Index 1 = level 0, Index 2-8 = levels 1-7, Index 9 = full-speed
+    if (new_speed >= 1 && new_speed < FAN_LVL_FULL) {
+        actual_level = new_speed - 1;
+    }
+
     switch(new_speed) {
         case 0:
             strncpy(speed_str, "auto", 5);
@@ -362,7 +371,7 @@ void change_fan_speed(int new_speed, application *app) {
             strncpy(speed_str, "full-speed", 11);
             break;
         default:
-            sprintf(speed_str, "%d", new_speed);
+            sprintf(speed_str, "%d", actual_level);
     }
     sprintf(tmp_str, "echo level %s > /proc/acpi/ibm/fan", speed_str);
     system(tmp_str);
