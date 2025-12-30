@@ -32,6 +32,7 @@ MA 02111, USA.
 #include <unistd.h>
 #include <stdbool.h>
 #include <gtk/gtk.h>
+#include <ctype.h>
 
 #define GTK_GUI_FILE "src/gui_new.glade"
 #define FAN_LVL_AUTO 0
@@ -272,7 +273,7 @@ void apply_fan_curve(GtkWidget *object, gpointer data) {
         g_source_remove(app->timeout);
     } else {
         app->fan_speed = FAN_LVL_AUTO; // assume auto -> this is most likely the value on startup
-        gtk_widget_set_sensitive(app->off_btn, TRUE);
+        gtk_widget_set_sensitive(GTK_WIDGET(app->off_btn), TRUE);
     }
     // either way, now we are running, in mode 2
     app->running = 1;
@@ -311,7 +312,7 @@ void apply_auto_speed(GtkWidget *object, gpointer data) {
         // we were running, so clear the timeout
         g_source_remove(app->timeout);
     } else {
-        gtk_widget_set_sensitive(app->off_btn, TRUE);
+        gtk_widget_set_sensitive(GTK_WIDGET(app->off_btn), TRUE);
     }
     sprintf(config_str, AUTO_LBL_FMT, app->scan_interval, app->temp_crit, app->temp_safe, fan_speeds[app->fan_speed]);
     gtk_label_set_text(app->auto_lbl, config_str);
@@ -339,7 +340,7 @@ void apply_manual_speed(GtkWidget *object, gpointer data) {
         g_source_remove(app->timeout);
     } else {
         // we were not yet running fan control, we are now, so enable the stop button
-        gtk_widget_set_sensitive( app->off_btn, TRUE);
+        gtk_widget_set_sensitive(GTK_WIDGET(app->off_btn), TRUE);
     }
     // first up, let's change the fan speed
     change_fan_speed(app->fan_speed, app);
